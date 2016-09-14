@@ -72,7 +72,19 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
     input_dim_sales=load_userinput('mmm_userinput_dim_sales')
     input_dim_salchan=load_userinput('mmm_userinput_dim_salchan')
     input_cps=load_userinput('mmm_userinput_cps')
+    # fill input data for missing dates
     input_plan=load_userinput('mmm_userinput_plan')
+    date_min=pd.to_datetime(pd.read_sql('select date_min from mmm_input_setup where client_id={}'.format(client_id),conn).date_min,format='%Y-%m-%d').min()
+    date_start=pd.to_datetime(input_plan.date,format='%Y-%m-%d').min()
+    date_missing=pd.date_range(date_min,date_start,freq='7D').strftime('%Y-%m-%d').tolist()
+    if len(date_missing)>1:
+        del date_missing[-1]
+    temp=input_plan.drop_duplicates(subset='bdgt_id').drop(['date','value'],axis=1)
+    n=temp.shape[0]
+    temp=temp.ix[temp.index.tolist()*len(date_missing)].copy()
+    temp['date']=np.repeat(np.array(date_missing),n)
+    temp['value']=0
+    input_plan=pd.concat([input_plan,temp],axis=0)
     conn.close()
     
     # filter var with dim input data
@@ -160,6 +172,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
     temp['week_id']=pd.to_datetime(temp.week_id,format='%Y-%m-%d')
     temp['week_id']=temp.week_id.dt.strftime('%Y-%m-%d')
     for_output=pd.merge(for_output,temp[['bdgt_id','week_id','Spend']],on=['bdgt_id','week_id'],how='inner')
+    for_output=for_output.ix[~(for_output.week_id.isin(date_missing))].copy()
     for_output=for_output.fillna(0)
     dim_metric=modelinput_metric.label.tolist()
     
@@ -168,7 +181,6 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
     dim_bdgt=mmm.get_dim_bdgt(client_path)+['week_id']
     list_temp=dim_bdgt+['Spend','bdgt_id']
     summary_sp=for_output.drop_duplicates(subset=['bdgt_id','week_id'])[list_temp]
-    #summary=[None]*modelinput_output.shape[0]
     summary={i:None for i in modelinput_output.label}
     modelinput_output['json']=''
     for i in range(modelinput_output.shape[0]):

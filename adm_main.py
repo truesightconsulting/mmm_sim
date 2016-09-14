@@ -96,7 +96,7 @@ def adm(client_path,main_path,is_staging,db_server,db_name,port,username,passwor
     # Create setup table
     print("Note: Creating Setup Table")
     date_start=pd.to_datetime(adm_setup.ix[adm_setup.attribute=='time','value'],format='%m/%d/%Y').dt.strftime('%Y-%m-%d').to_string(index=False)
-    temp=pd.DataFrame({'client_id':client_id,'date_start':date_start},index=[0])
+    temp=pd.DataFrame({'client_id':client_id,'date_min':date_start},index=[0])
     pd.io.sql.execute('delete from mmm_input_setup where client_id={}'.format(client_id),conn)
     temp.to_sql('mmm_input_setup',conn,index=False,if_exists='append',flavor='mysql')
     
