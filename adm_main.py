@@ -137,7 +137,7 @@ def adm(client_path,main_path,is_staging,db_server,db_name,port,username,passwor
         temp.to_sql(tb_name,conn,index=False,if_exists='append',flavor='mysql')
     temp=pd.read_sql('select * from {}'.format(tb_name),conn)
     temp=pd.merge(adm_modules,temp,on='label',how='left')
-    temp=temp.drop('label',axis=1).rename(columns={'id':'{}_id'.format(tb_name)})
+    temp=temp.drop('label',axis=1).rename(columns={'id':'mmm_label_module_id'})
     temp['client_id']=client_id
     pd.io.sql.execute('delete from mmm_modules where client_id={}'.format(client_id),conn)
     temp.to_sql('mmm_modules',conn,index=False,if_exists='append',flavor='mysql')
@@ -153,6 +153,7 @@ def adm(client_path,main_path,is_staging,db_server,db_name,port,username,passwor
     temp=pd.read_sql('select * from {}'.format(tb_name),conn)
     temp=pd.merge(adm_modules_dim,temp,on='label',how='left')
     temp=temp.drop('label',axis=1).rename(columns={'id':'{}_id'.format(tb_name)})
+    temp['dim']=temp.dim.str.replace('_id','')
     temp['client_id']=client_id
     pd.io.sql.execute('delete from mmm_modules_dim where client_id={}'.format(client_id),conn)
     temp.to_sql('mmm_modules_dim',conn,index=False,if_exists='append',flavor='mysql')
