@@ -103,13 +103,15 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
     
     # process input plan data
     print('Note: Processing plan')
+    input_plan=input_plan.fillna(0)
     date=input_plan.date.unique()
     dim_dma=mmm.get_dim_n('dma',client_path)
+    temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id'])
     def stack_plan(i):
         #i=date[0]
         list_temp=dim_dma+['date','value','bdgt_id']
         temp=input_plan.ix[input_plan.date==i,list_temp].copy()
-        temp=pd.merge(temp,modelinput_var[['bdgt_id','var','apprate','ratio']],on='bdgt_id',how='left')
+        temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','apprate','ratio']],on='bdgt_id',how='inner')
         temp['value']=temp['apprate']*temp['ratio']*temp['value']
         list_temp=dim_dma+['date','value','var']
         return temp[list_temp].copy()
@@ -217,6 +219,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
             dim_excel['week_name']='Week'
             temp=temp.rename(columns=dim_excel)
         summary[modelinput_output.label[i]]=temp
+        # convert to json
         modelinput_output.ix[i,'json']=temp.to_json(orient='records')
     
     # convert to json
@@ -224,12 +227,20 @@ def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name
     group=modelinput_output.drop_duplicates(subset=['group','chart'])[['group','chart']]
     group=group.reset_index().drop('index',axis=1)
     def to_json(i):
-        #i=4
+        #i=5
         index=(modelinput_output.group==group.group[i]) & (modelinput_output.chart==group.chart[i])
         temp=modelinput_output.ix[index].copy()
         temp=temp.reset_index()
         if temp.drilldown.tolist()[0]==1:
             list_temp=['"{}":{}'.format(temp.label[j].split('_')[1],temp.json[j]) for j in range(temp.shape[0])]
+            temp.ix[0,'json']='{'+','.join(list_temp)+'}'
+            temp=temp.ix[[0]].copy()
+        elif group.chart[i]=='area':
+            temp_type=temp.type[0]
+            temp_prefix=[list(filter(lambda x: temp_type in x,temp.dim[j].split(',')))[0] for j in range(temp.shape[0])]
+            temp_dim=pd.read_csv('adm_modules_dim.csv',index_col='dim')
+            temp_prefix=temp_dim.ix[temp_prefix].label.tolist()
+            list_temp=['"{}":{}'.format(temp_prefix[j],temp.json[j]) for j in range(temp.shape[0])]
             temp.ix[0,'json']='{'+','.join(list_temp)+'}'
             temp=temp.ix[[0]].copy()
         temp=temp.drop(['label','index','dim'],axis=1)

@@ -114,9 +114,20 @@ def adm(client_path,main_path,is_staging,db_server,db_name,port,username,passwor
     
     # cps table
     print('Note: Creating CPS table')
-    temp=adm_data_var[mmm.get_dim_bdgt(client_path)+['bdgt_id','cpp','client_id']].drop_duplicates('bdgt_id').rename(columns={'cpp':'cps'})
+    temp=adm_data_var[mmm.get_dim_bdgt(client_path)+['bdgt_id','cpp','client_id']].drop_duplicates('bdgt_id').rename(columns={'cpp':'cps'})   
     pd.io.sql.execute('delete from mmm_input_cps where client_id={}'.format(client_id),conn)
     temp.to_sql('mmm_input_cps',conn,index=False,if_exists='append',flavor='mysql')
+    dim=mmm.get_dim_bdgt(client_path)
+    temp_adm_data_var=adm_data_var.copy()
+    for i in dim:
+        #i=dim[0]
+        tb_name='mmm_label_{}'.format(i.split('_id')[0])
+        temp=pd.read_sql('select * from {}'.format(tb_name),conn)
+        temp=temp.rename(columns={'id':i,'label':i.replace('_id','_name')})
+        temp_adm_data_var=pd.merge(temp_adm_data_var,temp,on=i,how='left') 
+    temp=temp_adm_data_var.drop_duplicates('bdgt_id')[dim+['bdgt_id']+[i.replace('_id','_name') for i in dim]+['cpp']]
+    temp=temp.rename(columns={'cpp':'cps'})
+    temp.to_csv('upload_cps.csv',index=False)
     
     # input_plan table
     print('Note: Creating input_plan table')
