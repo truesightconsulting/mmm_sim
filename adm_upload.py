@@ -1,34 +1,34 @@
 import sys
-#client_path=sys.argv[1]
-#main_path=sys.argv[2]
-#user_id=int(sys.argv[3])
-#client_id=int(sys.argv[4])
-#db_server=sys.argv[5]
-#db_name=sys.argv[6]
-#port=int(sys.argv[7])
-#username=sys.argv[8]
-#password=sys.argv[9]
-#file_name=sys.argv[10]
-#save_name=sys.argv[11]
+client_path=sys.argv[1]
+main_path=sys.argv[2]
+user_id=int(sys.argv[3])
+client_id=int(sys.argv[4])
+db_server=sys.argv[5]
+db_name=sys.argv[6]
+port=int(sys.argv[7])
+username=sys.argv[8]
+password=sys.argv[9]
+file_name=sys.argv[10]
+save_name=sys.argv[11]
 
-client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
-main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
-user_id=1
-client_id=31
-# DB server info
-is_staging=True
-db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
-db_server="127.0.0.1"
-db_name="nviz"
-port=3306
-if is_staging:
-    username="root"
-    password="bitnami"
-else:
-    username="Zkdz408R6hll"
-    password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
-file_name='c:/Users/XinZhou/Documents/GitHub/demo/admin/mmm/upload_cps.csv'
-save_name='test1'
+#client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
+#main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
+#user_id=1
+#client_id=31
+## DB server info
+#is_staging=True
+#db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
+#db_server="127.0.0.1"
+#db_name="nviz"
+#port=3306
+#if is_staging:
+#    username="root"
+#    password="bitnami"
+#else:
+#    username="Zkdz408R6hll"
+#    password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
+#file_name='c:/Users/XinZhou/Documents/GitHub/demo/admin/mmm/upload_cps.csv'
+#save_name='test1'
 
 import sqlalchemy
 import numpy as np
