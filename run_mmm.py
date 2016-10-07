@@ -28,4 +28,4 @@ password=sys.argv[9]
   
 sys.path.append(main_path)
 from mmm_main import mmm_main
-mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name,port,username,password)
+mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password)
