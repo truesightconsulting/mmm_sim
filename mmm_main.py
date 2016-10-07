@@ -1,4 +1,4 @@
-def mmm_main(client_path,main_path,mmm_id,client_id,is_staging,db_server,db_name,port,username,password):
+def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
 #    client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
 #    main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
 #    mmm_id=1
