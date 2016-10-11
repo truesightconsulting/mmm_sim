@@ -176,3 +176,4 @@ def adm(client_path,main_path,is_staging,db_server,db_name,port,username,passwor
     
     # close db connection
     conn.close()
+    print('Note: Done!')
