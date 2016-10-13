@@ -35,6 +35,14 @@ def get_dim_bdgt(client_path):
     index=adm_setup['attribute']=='bdgt_dim'
     return adm_setup.ix[index,'value'].tolist()[0].split(',')
 
+
+def get_dim_bdgt_group(client_path):
+    #x='chan'
+    adm_setup=pd.read_csv('{}/adm_setup.csv'.format(client_path))
+    index=adm_setup['attribute']=='bdgt_dim'
+    x=adm_setup.ix[index,'value'].tolist()[0].split(',')
+    return list(set([i[:-4] for i in x]))
+
 def decomp_f(name):
     if name=='ninah':
         def f(x,var,group_dma,group_model):

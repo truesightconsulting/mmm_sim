@@ -1,10 +1,10 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
 #    client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
 #    main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
-#    mmm_id=1
-#    client_id=31
+#    mmm_id=61
+#    client_id=12
 #    # DB server info
-#    is_staging=True
+#    is_staging=False
 #    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
 #    db_server="127.0.0.1"
 #    db_name="nviz"
@@ -104,6 +104,13 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     # process input plan data
     print('Note: Processing plan')
     input_plan=input_plan.fillna(0)
+    dim=mmm.get_dim_bdgt_group(client_path)
+    for i in dim:
+        #i=dim[0]
+        expr = "input_dim_{}.copy()".format(i)
+        temp=eval(parser.expr(expr).compile())
+        key=mmm.get_dim_n(i,client_path)
+        input_plan=pd.merge(input_plan,temp[key],on=key,how='inner')
     date=input_plan.date.unique()
     dim_dma=mmm.get_dim_n('dma',client_path)
     temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id'])
