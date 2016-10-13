@@ -45,6 +45,8 @@ import importlib
 engine=sqlalchemy.create_engine('mysql+pymysql://{}:{}@{}/{}'.format(username,password,db_server,db_name))
 conn=engine.connect()
 
+raw_cps=pd.read_csv(file_name)
+
 # several checks
 save_table=pd.read_sql('select * from mmm_cps where client_id={}'.format(client_id),conn)
 if save_name in save_table.name:
@@ -54,7 +56,6 @@ elif raw_cps.isnull().values.any():
 elif raw_cps.duplicated('bdgt_id').any():
     print("Error: There is dimension duplication in your file. Please check.")
 else:
-    raw_cps=pd.read_csv(file_name)
     keep=raw_cps.columns[~raw_cps.columns.str.contains('_name')]
     raw_cps=raw_cps[keep]
     temp=pd.DataFrame({'client_id':client_id,'user_id':user_id,'name':save_name,'created':datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')},index=[0])
