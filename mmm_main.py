@@ -1,8 +1,8 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
-#    client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
+#    client_path='c:/Users/XinZhou/Documents/GitHub/wells/'
 #    main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
-#    mmm_id=61
-#    client_id=12
+#    mmm_id=63
+#    client_id=27
 #    # DB server info
 #    is_staging=False
 #    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
@@ -66,7 +66,10 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     modules_dim=pd.read_csv('adm_modules_dim.csv')
     modelinput_output=pd.read_sql('select * from mmm_modelinput_output where client_id={}'.format(client_id),conn).drop(['id','client_id'],axis=1)
     def load_userinput(x):
-        return pd.read_sql('select * from {} where mmm_id={}'.format(x,mmm_id),conn).dropna(how='all',axis=1).drop(['id','mmm_id'],axis=1)
+        #x='mmm_userinput_dim_salchan'
+        temp=pd.read_sql('select * from {} where mmm_id={}'.format(x,mmm_id),conn)
+        if temp.shape[0]!=0:
+            return pd.read_sql('select * from {} where mmm_id={}'.format(x,mmm_id),conn).dropna(how='all',axis=1).drop(['id','mmm_id'],axis=1)
     input_dim_chan=load_userinput('mmm_userinput_dim_chan')
     input_dim_dma=load_userinput('mmm_userinput_dim_dma')
     input_dim_sales=load_userinput('mmm_userinput_dim_sales')
