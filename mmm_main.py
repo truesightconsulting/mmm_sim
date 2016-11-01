@@ -1,10 +1,10 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
 #    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
 #    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
-#    mmm_id=66
-#    client_id=27
+#    mmm_id=57
+#    client_id=40
 #    # DB server info
-#    is_staging=False
+#    is_staging=True
 #    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
 #    db_server="127.0.0.1"
 #    db_name="nviz"
@@ -15,18 +15,18 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
 #    else:
 #      username="Zkdz408R6hll"
 #      password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
-#    
-#    import sqlalchemy
-#    import numpy as np
-#    import pandas as pd
-#    import gc
-#    import os
-#    import itertools
-#    import datetime
-#    import functools
-#    import parser
-#    import sys
-#    import importlib
+    
+    import sqlalchemy
+    import numpy as np
+    import pandas as pd
+    import gc
+    import os
+    import itertools
+    import datetime
+    import functools
+    import parser
+    import sys
+    import importlib
     
     # set pwd
     client_path='{}admin/mmm/'.format(client_path)
@@ -95,6 +95,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     # fill input data for missing dates and adjust input_spend with cps
     input_plan=load_userinput('mmm_userinput_plan')
     input_plan=input_plan.fillna(0)
+    input_plan_orig=input_plan.copy()
     input_plan=pd.merge(input_plan,input_cps_update,on='bdgt_id',how='left')
     input_plan['value']=input_plan['value']/input_plan['cps']
     input_plan=input_plan.drop('cps',axis=1)
@@ -187,7 +188,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     for i in range(modelinput_metric.shape[0]):
         for_output[modelinput_metric.label[i]]=for_output[modelinput_metric.metric[i]]*for_output.value
     for_output['week_id']=for_output.week_name
-    temp=input_plan.rename(columns={'value':'Spend','date':'week_id'})
+    temp=input_plan_orig.rename(columns={'value':'Spend','date':'week_id'})
     temp['week_id']=pd.to_datetime(temp.week_id,format='%Y-%m-%d')
     temp['week_id']=temp.week_id.dt.strftime('%Y-%m-%d')
     for_output=pd.merge(for_output,temp[['bdgt_id','week_id','Spend']],on=['bdgt_id','week_id'],how='inner')
