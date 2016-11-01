@@ -52,7 +52,9 @@ def decomp_f(name):
             '''
 #            x=temp
 #            var=temp_var
-            date=x.date
+#            group_dma=i
+#            group_model=j
+            date=x.date.as_matrix()
             x=x.drop('date',axis=1).as_matrix()
             decay=np.exp(np.log(0.5)/var.hl)
             learn=-10*np.log(1-var.hrf)

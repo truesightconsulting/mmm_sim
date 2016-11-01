@@ -1,7 +1,7 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
-#    client_path='c:/Users/XinZhou/Documents/GitHub/wells/'
-#    main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
-#    mmm_id=63
+#    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
+#    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
+#    mmm_id=66
 #    client_id=27
 #    # DB server info
 #    is_staging=False
@@ -66,7 +66,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     modules_dim=pd.read_csv('adm_modules_dim.csv')
     modelinput_output=pd.read_sql('select * from mmm_modelinput_output where client_id={}'.format(client_id),conn).drop(['id','client_id'],axis=1)
     def load_userinput(x):
-        #x='mmm_userinput_dim_salchan'
+#        x='mmm_userinput_dim_salchan'
         temp=pd.read_sql('select * from {} where mmm_id={}'.format(x,mmm_id),conn)
         if temp.shape[0]!=0:
             return pd.read_sql('select * from {} where mmm_id={}'.format(x,mmm_id),conn).dropna(how='all',axis=1).drop(['id','mmm_id'],axis=1)
@@ -109,7 +109,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     input_plan=input_plan.fillna(0)
     dim=mmm.get_dim_bdgt_group(client_path)
     for i in dim:
-        #i=dim[0]
+        i=dim[0]
         expr = "input_dim_{}.copy()".format(i)
         temp=eval(parser.expr(expr).compile())
         key=mmm.get_dim_n(i,client_path)
@@ -118,7 +118,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     dim_dma=mmm.get_dim_n('dma',client_path)
     temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id'])
     def stack_plan(i):
-        #i=date[0]
+#        i=date[0]
         list_temp=dim_dma+['date','value','bdgt_id']
         temp=input_plan.ix[input_plan.date==i,list_temp].copy()
         temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','apprate','ratio']],on='bdgt_id',how='inner')
