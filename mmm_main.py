@@ -1,32 +1,32 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
-    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
-    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
-    mmm_id=66
-    client_id=27
-    # DB server info
-    is_staging=False
-    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
-    db_server="127.0.0.1"
-    db_name="nviz"
-    port=3306
-    if is_staging:
-      username="root"
-      password="bitnami"
-    else:
-      username="Zkdz408R6hll"
-      password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
-    
-    import sqlalchemy
-    import numpy as np
-    import pandas as pd
-    import gc
-    import os
-    import itertools
-    import datetime
-    import functools
-    import parser
-    import sys
-    import importlib
+#    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
+#    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
+#    mmm_id=66
+#    client_id=27
+#    # DB server info
+#    is_staging=False
+#    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
+#    db_server="127.0.0.1"
+#    db_name="nviz"
+#    port=3306
+#    if is_staging:
+#      username="root"
+#      password="bitnami"
+#    else:
+#      username="Zkdz408R6hll"
+#      password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
+#    
+#    import sqlalchemy
+#    import numpy as np
+#    import pandas as pd
+#    import gc
+#    import os
+#    import itertools
+#    import datetime
+#    import functools
+#    import parser
+#    import sys
+#    import importlib
     
     # set pwd
     client_path='{}admin/mmm/'.format(client_path)
