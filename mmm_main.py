@@ -1,20 +1,20 @@
 def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,username,password):
-#    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
-#    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
-#    mmm_id=66
-#    client_id=27
-#    # DB server info
-#    is_staging=False
-#    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
-#    db_server="127.0.0.1"
-#    db_name="nviz"
-#    port=3306
-#    if is_staging:
-#      username="root"
-#      password="bitnami"
-#    else:
-#      username="Zkdz408R6hll"
-#      password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
+    client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
+    main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
+    mmm_id=66
+    client_id=27
+    # DB server info
+    is_staging=False
+    db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
+    db_server="127.0.0.1"
+    db_name="nviz"
+    port=3306
+    if is_staging:
+      username="root"
+      password="bitnami"
+    else:
+      username="Zkdz408R6hll"
+      password="XH3RoKdopf12L4BJbqXTtD2yESgwL$fGd(juW)ed"
     
     import sqlalchemy
     import numpy as np
@@ -75,8 +75,30 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     input_dim_sales=load_userinput('mmm_userinput_dim_sales')
     input_dim_salchan=load_userinput('mmm_userinput_dim_salchan')
     input_cps=load_userinput('mmm_userinput_cps')
-    # fill input data for missing dates
+    
+    # filter var with dim input data
+    print('Note: Filting variables')
+    dim=mmm.get_dim(client_path)
+    for i in dim:
+        #i=dim[2]
+        expr = "input_dim_{}.copy()".format(i)
+        temp=eval(parser.expr(expr).compile())
+        key=mmm.get_dim_n(i,client_path)
+        modelinput_var=pd.merge(modelinput_var,temp[key],on=key,how='inner')
+        
+    # cps & apprate update
+    modelinput_var=pd.merge(modelinput_var,input_cps[['bdgt_id','cps']],on='bdgt_id',how='left')
+    modelinput_var.ix[modelinput_var.cps.isnull(),'cps']=modelinput_var.cpp[modelinput_var.cps.isnull()]
+    modelinput_var['beta']= modelinput_var['beta']*modelinput_var['apprate']
+    input_cps_update=modelinput_var.drop_duplicates(subset=['bdgt_id'])[['bdgt_id','cps']]                  
+        
+    # fill input data for missing dates and adjust input_spend with cps
     input_plan=load_userinput('mmm_userinput_plan')
+    input_plan=input_plan.fillna(0)
+    input_plan=pd.merge(input_plan,input_cps_update,on='bdgt_id',how='left')
+    input_plan['value']=input_plan['value']/input_plan['cps']
+    input_plan=input_plan.drop('cps',axis=1)
+    
     date_min=pd.to_datetime(pd.read_sql('select date_min from mmm_input_setup where client_id={}'.format(client_id),conn).date_min,format='%Y-%m-%d').min()
     date_start=pd.to_datetime(input_plan.date,format='%Y-%m-%d').min()
     date_missing=pd.date_range(date_min,date_start,freq='7D').strftime('%Y-%m-%d').tolist()
@@ -90,23 +112,8 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     input_plan=pd.concat([input_plan,temp],axis=0)
     conn.close()
     
-    # filter var with dim input data
-    print('Note: Filting variables')
-    dim=mmm.get_dim(client_path)
-    for i in dim:
-        #i=dim[2]
-        expr = "input_dim_{}.copy()".format(i)
-        temp=eval(parser.expr(expr).compile())
-        key=mmm.get_dim_n(i,client_path)
-        modelinput_var=pd.merge(modelinput_var,temp[key],on=key,how='inner')
-        
-    # cps update
-    modelinput_var=pd.merge(modelinput_var,input_cps[['bdgt_id','cps']],on='bdgt_id',how='left')
-    modelinput_var.ix[modelinput_var.cps.isnull(),'cps']=modelinput_var.cpp[modelinput_var.cps.isnull()]
-    
     # process input plan data
     print('Note: Processing plan')
-    input_plan=input_plan.fillna(0)
     dim=mmm.get_dim_bdgt_group(client_path)
     for i in dim:
         i=dim[0]
@@ -116,13 +123,13 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
         input_plan=pd.merge(input_plan,temp[key],on=key,how='inner')
     date=input_plan.date.unique()
     dim_dma=mmm.get_dim_n('dma',client_path)
-    temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id'])
+    temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id','var'])
     def stack_plan(i):
-#        i=date[0]
+#        i=date[2]
         list_temp=dim_dma+['date','value','bdgt_id']
         temp=input_plan.ix[input_plan.date==i,list_temp].copy()
-        temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','apprate','ratio']],on='bdgt_id',how='inner')
-        temp['value']=temp['apprate']*temp['ratio']*temp['value']
+        temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','ratio']],on='bdgt_id',how='inner')
+        temp['value']=temp['ratio']*temp['value']
         list_temp=dim_dma+['date','value','var']
         return temp[list_temp].copy()
     

@@ -61,9 +61,9 @@ def decomp_f(name):
             temp=np.zeros_like(x)
             for i in range(temp.shape[0]):
                 if i==0:
-                    temp[0]=(1-(1/np.exp(learn*(x[i]/var.cps)/var['max'])))
+                    temp[0]=(1-(1/np.exp(learn*(x[i])/var['max'])))
                 else:
-                    temp[i]=(1-((1-temp[i-1]*decay)/np.exp(learn*(x[i]/var.cps)/var['max'])))
+                    temp[i]=(1-((1-temp[i-1]*decay)/np.exp(learn*(x[i])/var['max'])))
             temp=pd.DataFrame(var.beta.as_matrix()*temp,columns=var['var'])
             temp['date']=date
             temp['group_dma']=group_dma
