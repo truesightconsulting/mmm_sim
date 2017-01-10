@@ -88,9 +88,10 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
         
     # cps & apprate update
     modelinput_var=pd.merge(modelinput_var,input_cps[['bdgt_id','cps']],on='bdgt_id',how='left')
+    modelinput_var.loc[modelinput_var.cpp==1,'cps']=1
     modelinput_var.ix[modelinput_var.cps.isnull(),'cps']=modelinput_var.cpp[modelinput_var.cps.isnull()]
     modelinput_var['beta']= modelinput_var['beta']*modelinput_var['apprate']
-    input_cps_update=modelinput_var.drop_duplicates(subset=['bdgt_id'])[['bdgt_id','cps']]                  
+    input_cps_update=modelinput_var.drop_duplicates(subset=['bdgt_id','var'])[['bdgt_id','var','cps']]                  
         
     # fill input data for missing dates and adjust input_spend with cps
     input_plan=load_userinput('mmm_userinput_plan')
@@ -105,7 +106,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     date_missing=pd.date_range(date_min,date_start,freq='7D').strftime('%Y-%m-%d').tolist()
     if len(date_missing)>1:
         del date_missing[-1]
-    temp=input_plan.drop_duplicates(subset='bdgt_id').drop(['date','value'],axis=1)
+    temp=input_plan.drop_duplicates(subset=['bdgt_id','var']).drop(['date','value'],axis=1)
     n=temp.shape[0]
     temp=temp.ix[temp.index.tolist()*len(date_missing)].copy()
     temp['date']=np.repeat(np.array(date_missing),n)
@@ -117,7 +118,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     print('Note: Processing plan')
     dim=mmm.get_dim_bdgt_group(client_path)
     for i in dim:
-        i=dim[0]
+#        i=dim[0]
         expr = "input_dim_{}.copy()".format(i)
         temp=eval(parser.expr(expr).compile())
         key=mmm.get_dim_n(i,client_path)
@@ -127,9 +128,9 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     temp_modelinput_var=modelinput_var.drop_duplicates(subset=['bdgt_id','var'])
     def stack_plan(i):
 #        i=date[2]
-        list_temp=dim_dma+['date','value','bdgt_id']
+        list_temp=dim_dma+['date','value','bdgt_id','var']
         temp=input_plan.ix[input_plan.date==i,list_temp].copy()
-        temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','ratio']],on='bdgt_id',how='inner')
+        temp=pd.merge(temp,temp_modelinput_var[['bdgt_id','var','ratio']],on=['bdgt_id','var'],how='inner')
         temp['value']=temp['ratio']*temp['value']
         list_temp=dim_dma+['date','value','var']
         return temp[list_temp].copy()
@@ -159,7 +160,7 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     
     def decomp(x):
         i=group_dma[0]
-        j=group_model[0]
+        j=group_model[1]
         i=x[0]
         j=x[1]
         temp_var=modelinput_var.ix[(modelinput_var.group_dma==i) & (modelinput_var.group_model==j)].copy()

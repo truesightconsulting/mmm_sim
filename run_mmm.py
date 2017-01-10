@@ -9,12 +9,12 @@ port=int(sys.argv[7])
 username=sys.argv[8]
 password=sys.argv[9]
 
-#client_path='c:/Users/XinZhou/Documents/GitHub/demo/'
-#main_path='c:/Users/XinZhou/Documents/GitHub/mmm_sim/'
-#mmm_id=1
-#client_id=31
+#client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
+#main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
+#mmm_id=101
+#client_id=27
 ## DB server info
-#is_staging=True
+#is_staging=False
 #db_server="bitnami.cluster-chdidqfrg8na.us-east-1.rds.amazonaws.com"
 #db_server="127.0.0.1"
 #db_name="nviz"
