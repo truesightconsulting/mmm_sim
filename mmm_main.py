@@ -159,8 +159,8 @@ def mmm_main(client_path,main_path,mmm_id,client_id,db_server,db_name,port,usern
     f_name=mmm.get_f_name(client_path)
     
     def decomp(x):
-        i=group_dma[0]
-        j=group_model[1]
+#        i=group_dma[0]
+#        j=group_model[1]
         i=x[0]
         j=x[1]
         temp_var=modelinput_var.ix[(modelinput_var.group_dma==i) & (modelinput_var.group_model==j)].copy()

@@ -11,7 +11,7 @@ password=sys.argv[9]
 
 #client_path='C:/Users/yuemeng1/Desktop/TOOL/wells/'
 #main_path='C:/Users/yuemeng1/Desktop/code/mmm_sim/'
-#mmm_id=101
+#mmm_id=123
 #client_id=27
 ## DB server info
 #is_staging=False
